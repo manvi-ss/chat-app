@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 
 const image = require("../media/images/background-image.png");
