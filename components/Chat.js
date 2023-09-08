@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import CustomsActions from "./CustomActions";
+import MapView from "react-native-maps";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import {
   StyleSheet,
@@ -17,8 +19,8 @@ import {
 } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const Chat = ({ route, navigation, db, isConnected }) => {
-  const { name, color, _id } = route.params;
+const Chat = ({ route, navigation, db, isConnected, storage }) => {
+  const { name, color, userID } = route.params;
   const [messages, setMessages] = useState([]); //Creating message state
 
   const cacheMessages = async (messagesToCache) => {
@@ -101,18 +103,41 @@ const Chat = ({ route, navigation, db, isConnected }) => {
       />
     );
   };
+  const renderCustomActions = (props) => {
+    return <CustomsActions storage={storage} userID={userID} {...props} />;
+  };
+
+  const renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <View style={[styles.container, { backgroundColor: color }]}>
       <GiftedChat
         messages={messages}
         renderBubble={renderBubble}
+        renderInputToolbar={renderInputToolbar}
         onSend={(message) => addMessage(message)}
+        renderActions={renderCustomActions}
+        renderCustomView={renderCustomView}
         user={{
-          _id: _id,
+          _id: userID,
           name: name,
         }}
-        renderInputToolbar={renderInputToolbar}
       />
       {Platform.OS === "ios" ? (
         <KeyboardAvoidingView behavior="padding" />

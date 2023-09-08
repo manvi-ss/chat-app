@@ -31,7 +31,7 @@ const Start = ({ navigation }) => {
       .then((result) => {
         navigation.navigate("Chat", {
           name: name,
-          _id: result.user.uid,
+          userID: result.user.uid,
           color: color,
         });
         Alert.alert("Signed in Succesfully");
